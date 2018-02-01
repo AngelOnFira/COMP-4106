@@ -1,1 +1,5 @@
 Program('main.cpp')
+
+env = Environment()
+
+env.Append( CPPFLAGS=['-std=c++11', '-pthread', '-Wall', '-g'] )
