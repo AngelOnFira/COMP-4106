@@ -41,10 +41,11 @@ int* createNewBoard(int* old_board) {
 int depthFirstSearch() {
     //static int board [ARR_SIZE] = {};
     std::stack<int*> fringe;
+	std::stack<std::vector<int>> breakcrumbs;
     std::unordered_map<std::string,bool> check_position;
 
     bool compare = true;
-    int win_board [ARR_SIZE] = {
+    int* win_board = new int[ARR_SIZE] {
         0, 0, 2, 2, 2, 0, 0,
         0, 2, 2, 2, 2, 2, 0,
         2, 2, 2, 2, 2, 2, 2,
@@ -54,7 +55,7 @@ int depthFirstSearch() {
         0, 0, 2, 2, 2, 0, 0
     };
 
-    int start_board [ARR_SIZE] = {
+    int* start_board = new int[ARR_SIZE] {
         0, 0, 1, 1, 1, 0, 0,
         0, 1, 1, 1, 1, 1, 0,
         1, 1, 1, 2, 1, 1, 1,
@@ -66,32 +67,12 @@ int depthFirstSearch() {
 
     fringe.push(start_board);
 
-    /*int win_board [ARR_SIZE] = {
-        0, 0, 1, 0, 0,
-        0, 0, 1, 0, 0,
-        1, 1, 0, 1, 1,
-        1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1
-    };*/
-
     int one_count = 0;
-
-    /*if (one_count < 6) {
-        printBoard(board);
-    }*/
-
-    //printBoard(board);
     int min = 100;
+
     while (!fringe.empty()) {
-        std::cout << "tesT" << std::endl;
-        //std::cout <<"Fringe size " << fringe.size() << std::endl;
         int* this_board = fringe.top();
         fringe.pop();
-
-        //printBoard(this_board);
-        //for (auto it : check_position) 
-            //std::cout << it.first << std::endl;
-        //std::cout << "\n\n" << std::endl;
 
         //Check if this is a winning board
         bool win = true;
@@ -110,17 +91,14 @@ int depthFirstSearch() {
             min = one_count;
             std::cout << "------------------------" << std::endl;
             std::cout << min << std::endl;
+			std::cout << fringe.size() << std::endl;
             printBoard(this_board);
             std::cout << "------------------------" << std::endl;            
         }
-        /*std::cout << one_count << std::endl;
-        if (one_count < 34) {
-            printBoard(this_board);
-            std::cout << sizeof(*this_board) << std::endl;
-            return;
-        }*/
+
         //Check if we have won
         if (win) {
+			std::cout << "WIN" << std::endl;
             printBoard(this_board);
             return 1;
         }
@@ -142,26 +120,17 @@ int depthFirstSearch() {
                     applyBoardChanges(this_board, i + 2, i + 1, i, fringe, check_position);
                 }
             }
-        }
-        //delete [] this_board;
-        /*std::cout << fringe.size() << std::endl;
-        std::cout << "" << std::endl;
-        if (fringe.size() > 100) {
-            return;
-        }*/
+         }
+		delete[] this_board;
     }
 }
 
 void applyBoardChanges(int* old_board, int check1, int check2, int i, std::stack<int*> &fringe, std::unordered_map<std::string,bool> &check_position) {
-    int* new_board = new int[ARR_SIZE]{
-        0, 0, 1, 1, 1, 0, 0,
-        0, 1, 1, 1, 1, 1, 0,
-        1, 1, 1, 2, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1,
-        0, 1, 1, 1, 1, 1, 0,
-        0, 0, 1, 1, 1, 0, 0
-    };
+	int* new_board = new int[ARR_SIZE];
+
+	for (int i = 0; i < ARR_SIZE; i++) {
+		new_board[i] = old_board[i];
+	}
 
     if (old_board[check1] == 1 && old_board[check2] == 1) {
         new_board[i] = 1;
@@ -169,6 +138,7 @@ void applyBoardChanges(int* old_board, int check1, int check2, int i, std::stack
         new_board[check1] = 2;
     }
     else {
+		delete[] new_board;
         new_board = nullptr;
     }
 
@@ -180,23 +150,18 @@ void applyBoardChanges(int* old_board, int check1, int check2, int i, std::stack
             check_position[board_string] = true;
         }
         else {
-            /*printBoard(new_board);
-            for (auto it : check_position) 
-                std::cout << it.first << std::endl;
-            std::cout << "\n\n" << std::endl;
-            std::cout << board_string << std::endl;
-            exit(1);*/
-            //std::cout << "found same move" << std::endl;
+			delete[] new_board;
         }
     }
 }
 
 std::string convert_array(int* board) {
-    //printBoard(board);
     std::string new_array = "";
 
     for (int i = 0; i < ARR_SIZE; i++) {
-        new_array.append(std::to_string(board[i]));
+		if (board[i] != 0) {
+			new_array.append(std::to_string(board[i]));
+		}
     }
     return new_array;
 }
@@ -205,12 +170,15 @@ void printBoard(int* board) {
     for (int y = 0; y < WIDTH; y++) {
         for (int x = 0; x < WIDTH; x++) {
             int pos = y * WIDTH + x;
-            if (board[pos] == 0 || board[pos] == 2) {
-                std::cout << "[0]";
+            if (board[pos] == 0) {
+				std::cout << "[#]";
             }
-            else {
-                std::cout << "[1]";
-            }
+			else if (board[pos] == 1) {
+				std::cout << "[+]";
+			}
+			else {
+				std::cout << "[ ]";
+			}
         }
         std::cout << "" << std::endl;
     }
@@ -219,27 +187,10 @@ void printBoard(int* board) {
 }
 
 int main() {
-    /*int board [ARR_SIZE] = {
-        0, 0, 1, 1, 1, 0, 0,
-        0, 1, 1, 1, 1, 1, 0,
-        1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 2, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1,
-        0, 1, 1, 1, 1, 1, 0,
-        0, 0, 1, 1, 1, 0, 0
-    };*/
-
-    int board [ARR_SIZE] = {
-        1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1,
-        1, 1, 2, 1, 1,
-        1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1
-    };
 
     std::cout << depthFirstSearch() << std::endl;
 
-    //printBoard(new_board);
+	system("PAUSE");
 
     return 1;
 }
