@@ -4,7 +4,7 @@ DepthFirst::DepthFirst() {
 
 }
 
-DepthFirst::DepthFirst(int* start_board) {
+DepthFirst::DepthFirst(int* input_board) {
 	std::cout << "Running the depth-first search" << std::endl;
 	win_board = new int[ARR_SIZE] {
 		0, 0, 2, 2, 2, 0, 0,
@@ -16,7 +16,13 @@ DepthFirst::DepthFirst(int* start_board) {
 		0, 0, 2, 2, 2, 0, 0
 	};
 
-	this->start_board = start_board;
+	path_board = new int[ARR_SIZE];
+	start_board = new int[ARR_SIZE];
+
+	for (int i = 0; i < ARR_SIZE; i++) {
+		path_board[i] = input_board[i];
+		start_board[i] = input_board[i];
+	}
 
 	fringe.push(start_board);
 	std::vector<int>* start_path = new std::vector<int>();
@@ -50,16 +56,6 @@ void DepthFirst::runSearch() {
 		if (win) {
 			std::cout << "COMPLETED" << std::endl;
 
-			int* path_board = new int[ARR_SIZE] {
-				0, 0, 1, 1, 1, 0, 0,
-				0, 1, 1, 1, 1, 1, 0,
-				1, 1, 1, 2, 1, 1, 1,
-				1, 1, 1, 1, 1, 1, 1,
-				1, 1, 1, 1, 1, 1, 1,
-				0, 1, 1, 1, 1, 1, 0,
-				0, 0, 1, 1, 1, 0, 0
-			};
-
 			for (int i = 0; i < this_path->size(); i += 3) {
 				printBoard(path_board);
 				path_board[this_path->at(i)] = 2;
@@ -68,7 +64,6 @@ void DepthFirst::runSearch() {
 			}
 			printBoard(path_board);
 			std::cout << "This solution took " << iterations << " iterations to complete." << std::endl;
-			system("PAUSE");
 			return;
 		}
 
@@ -91,6 +86,7 @@ void DepthFirst::runSearch() {
 			}
 		}
 		iterations++;
+		delete this_path;
 		delete[] this_board;
 	}
 }

@@ -4,7 +4,7 @@ BreadthFirst::BreadthFirst() {
 
 }
 
-BreadthFirst::BreadthFirst(int* start_board) {
+BreadthFirst::BreadthFirst(int* input_board) {
 	std::cout << "Running the breadth-first search" << std::endl;
 	win_board = new int[ARR_SIZE] {
 		0, 0, 2, 2, 2, 0, 0,
@@ -16,7 +16,13 @@ BreadthFirst::BreadthFirst(int* start_board) {
 		0, 0, 2, 2, 2, 0, 0
 	};
 
-	this->start_board = start_board;
+	path_board = new int[ARR_SIZE];
+	start_board = new int[ARR_SIZE];
+
+	for (int i = 0; i < ARR_SIZE; i++) {
+		path_board[i] = input_board[i];
+		start_board[i] = input_board[i];
+	}
 
 	fringe.push(start_board);
 	std::vector<int>* start_path = new std::vector<int>();
@@ -46,24 +52,9 @@ void BreadthFirst::runSearch() {
 			}
 		};
 
-		if (one_count < min) {
-			min = one_count;
-			std::cout << "Solved down to " << min << " pegs" << std::endl;
-		}
-
 		//Check if we have won
 		if (win) {
 			std::cout << "WIN" << std::endl;
-
-			int* path_board = new int[ARR_SIZE] {
-				0, 0, 1, 1, 1, 0, 0,
-				0, 1, 1, 1, 1, 1, 0,
-				1, 1, 1, 2, 1, 1, 1,
-				1, 1, 1, 1, 1, 1, 1,
-				1, 1, 1, 1, 1, 1, 1,
-				0, 1, 1, 1, 1, 1, 0,
-				0, 0, 1, 1, 1, 0, 0
-			};
 
 			for (int i = 0; i < this_path->size(); i += 3) {
 				printBoard(path_board);
@@ -73,9 +64,17 @@ void BreadthFirst::runSearch() {
 			}
 			printBoard(path_board);
 			std::cout << "This solution took " << iterations << " iterations to complete." << std::endl;
-			system("PAUSE");
-		}
 
+			while (!fringe.empty()) {
+				int* del_board = fringe.front();
+				fringe.pop();
+				delete[] del_board;
+
+				std::vector<int>* del_path = breadcrumbs.front();
+				breadcrumbs.pop();
+				delete[] del_path;
+			}
+		}
 		for (int i = 0; i < ARR_SIZE; i++) {
 			if (this_board[i] == 2) {
 				int row = i / WIDTH;
@@ -95,6 +94,7 @@ void BreadthFirst::runSearch() {
 			}
 		}
 		iterations++;
+		delete this_path;
 		delete[] this_board;
 	}
 }
@@ -115,7 +115,6 @@ void BreadthFirst::applyBoardChanges(int* old_board, int check1, int check2, int
 		delete[] new_board;
 		new_board = nullptr;
 	}
-
 	if (new_board) {
 		std::string board_string = convert_array(new_board);
 		std::unordered_map<std::string, bool>::const_iterator in_map = check_position.find(board_string);
