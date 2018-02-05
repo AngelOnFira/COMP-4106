@@ -83,6 +83,7 @@ int depthFirstSearch() {
     //printBoard(board);
     int min = 100;
     while (!fringe.empty()) {
+        std::cout << "tesT" << std::endl;
         //std::cout <<"Fringe size " << fringe.size() << std::endl;
         int* this_board = fringe.top();
         fringe.pop();
