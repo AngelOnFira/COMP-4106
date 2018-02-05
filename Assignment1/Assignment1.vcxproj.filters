@@ -21,6 +21,9 @@
     <ClCompile Include="depthFirst.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="breadthFirst.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -30,6 +33,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="breadthFirst.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -111,10 +111,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="breadthFirst.cpp" />
     <ClCompile Include="depthFirst.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="breadthFirst.h" />
     <ClInclude Include="depthFirst.h" />
     <ClInclude Include="includes.h" />
     <ClInclude Include="main.h" />

@@ -1,11 +1,11 @@
-#include "depthFirst.h"
+#include "breadthFirst.h"
 
-DepthFirst::DepthFirst() {
+BreadthFirst::BreadthFirst() {
 
 }
 
-DepthFirst::DepthFirst(int* start_board) {
-	std::cout << "Running the depth-first search" << std::endl;
+BreadthFirst::BreadthFirst(int* start_board) {
+	std::cout << "Running the breadth-first search" << std::endl;
 	win_board = new int[ARR_SIZE] {
 		0, 0, 2, 2, 2, 0, 0,
 		0, 2, 2, 2, 2, 2, 0,
@@ -25,12 +25,12 @@ DepthFirst::DepthFirst(int* start_board) {
 	runSearch();
 }
 
-void DepthFirst::runSearch() {
+void BreadthFirst::runSearch() {
 	while (!fringe.empty()) {
-		int* this_board = fringe.top();
+		int* this_board = fringe.front();
 		fringe.pop();
 
-		std::vector<int>* this_path = breadcrumbs.top();
+		std::vector<int>* this_path = breadcrumbs.front();
 		breadcrumbs.pop();
 
 		//Check if this is a winning board
@@ -42,13 +42,18 @@ void DepthFirst::runSearch() {
 			}
 			if (one_count > 1) {
 				win = false;
-				break;
+				//break;
 			}
 		};
 
+		if (one_count < min) {
+			min = one_count;
+			std::cout << "Solved down to " << min << " pegs" << std::endl;
+		}
+
 		//Check if we have won
 		if (win) {
-			std::cout << "COMPLETED" << std::endl;
+			std::cout << "WIN" << std::endl;
 
 			int* path_board = new int[ARR_SIZE] {
 				0, 0, 1, 1, 1, 0, 0,
@@ -69,7 +74,6 @@ void DepthFirst::runSearch() {
 			printBoard(path_board);
 			std::cout << "This solution took " << iterations << " iterations to complete." << std::endl;
 			system("PAUSE");
-			return;
 		}
 
 		for (int i = 0; i < ARR_SIZE; i++) {
@@ -95,7 +99,7 @@ void DepthFirst::runSearch() {
 	}
 }
 
-void DepthFirst::applyBoardChanges(int* old_board, int check1, int check2, int curr_pos, std::vector<int>* old_path) {
+void BreadthFirst::applyBoardChanges(int* old_board, int check1, int check2, int curr_pos, std::vector<int>* old_path) {
 	int* new_board = new int[ARR_SIZE];
 
 	for (int i = 0; i < ARR_SIZE; i++) {
@@ -134,7 +138,7 @@ void DepthFirst::applyBoardChanges(int* old_board, int check1, int check2, int c
 	}
 }
 
-std::string DepthFirst::convert_array(int* board) {
+std::string BreadthFirst::convert_array(int* board) {
 	std::string new_array = "";
 
 	for (int i = 0; i < ARR_SIZE; i++) {
@@ -145,7 +149,7 @@ std::string DepthFirst::convert_array(int* board) {
 	return new_array;
 }
 
-void DepthFirst::printBoard(int* board) {
+void BreadthFirst::printBoard(int* board) {
 	for (int y = 0; y < WIDTH; y++) {
 		for (int x = 0; x < WIDTH; x++) {
 			int pos = y * WIDTH + x;

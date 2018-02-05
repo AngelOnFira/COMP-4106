@@ -2,10 +2,10 @@
 
 #include "includes.h"
 
-class DepthFirst {
+class BreadthFirst {
 public:
-	DepthFirst();
-	DepthFirst(int* start_board);
+	BreadthFirst();
+	BreadthFirst(int* start_board);
 	void runSearch();
 	void applyBoardChanges(int* old_board, int check1, int check2, int curr_pos, std::vector<int>* old_path);
 	std::string convert_array(int* board);
@@ -18,7 +18,7 @@ public:
 	int* win_board;
 	int* start_board;
 
-	std::stack<int*> fringe;
-	std::stack<std::vector<int>*> breadcrumbs;
+	std::queue<int*> fringe;
+	std::queue<std::vector<int>*> breadcrumbs;
 	std::unordered_map<std::string, bool> check_position;
 };
