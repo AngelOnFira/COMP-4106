@@ -18,9 +18,18 @@
     <ClCompile Include="main.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="depthFirst.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="depthFirst.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
