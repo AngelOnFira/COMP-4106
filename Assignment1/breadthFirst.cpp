@@ -5,16 +5,9 @@ BreadthFirst::BreadthFirst() {
 }
 
 BreadthFirst::BreadthFirst(int* input_board) {
+	std::cout << "--------------------------------" << std::endl;
 	std::cout << "Running the breadth-first search" << std::endl;
-	win_board = new int[ARR_SIZE] {
-		0, 0, 2, 2, 2, 0, 0,
-		0, 2, 2, 2, 2, 2, 0,
-		2, 2, 2, 2, 2, 2, 2,
-		2, 2, 2, 1, 2, 2, 2,
-		2, 2, 2, 2, 2, 2, 2,
-		0, 2, 2, 2, 2, 2, 0,
-		0, 0, 2, 2, 2, 0, 0
-	};
+	std::cout << "--------------------------------" << std::endl;
 
 	path_board = new int[ARR_SIZE];
 	start_board = new int[ARR_SIZE];
@@ -48,13 +41,15 @@ void BreadthFirst::runSearch() {
 			}
 			if (one_count > 1) {
 				win = false;
-				//break;
+				break;
 			}
 		};
 
 		//Check if we have won
 		if (win) {
-			std::cout << "WIN" << std::endl;
+			std::cout << "This solution took " << iterations << " iterations to complete." << std::endl;
+			std::cout << "Here is the solution" << std::endl;
+			std::cout << "" << std::endl;
 
 			for (int i = 0; i < this_path->size(); i += 3) {
 				printBoard(path_board);
@@ -63,7 +58,11 @@ void BreadthFirst::runSearch() {
 				path_board[this_path->at(i + 2)] = 1;
 			}
 			printBoard(path_board);
-			std::cout << "This solution took " << iterations << " iterations to complete." << std::endl;
+
+			std::cout << "-----------------------------" << std::endl;
+			std::cout << "End of breadth-first solution" << std::endl;
+			std::cout << "-----------------------------" << std::endl;
+			std::cout << "" << std::endl;
 
 			while (!fringe.empty()) {
 				int* del_board = fringe.front();
@@ -99,6 +98,7 @@ void BreadthFirst::runSearch() {
 	}
 }
 
+//Make a move on a board
 void BreadthFirst::applyBoardChanges(int* old_board, int check1, int check2, int curr_pos, std::vector<int>* old_path) {
 	int* new_board = new int[ARR_SIZE];
 
@@ -137,6 +137,7 @@ void BreadthFirst::applyBoardChanges(int* old_board, int check1, int check2, int
 	}
 }
 
+//Convert a board state to a string that can be hashed
 std::string BreadthFirst::convert_array(int* board) {
 	std::string new_array = "";
 
@@ -148,6 +149,7 @@ std::string BreadthFirst::convert_array(int* board) {
 	return new_array;
 }
 
+//Display a board state in the console
 void BreadthFirst::printBoard(int* board) {
 	for (int y = 0; y < WIDTH; y++) {
 		for (int x = 0; x < WIDTH; x++) {
