@@ -8,8 +8,13 @@ Node::Node(int* board, Node* parent) {
 		this->depth = parent->depth + 1;
 	}
 
-	proximityHeuristic();
+	calculateScore();
 	serializeBoard();
+}
+
+void Node::calculateScore() {
+	proximityHeuristic();
+	score = depth * 0.0277f + proximityScore;
 }
 
 void Node::proximityHeuristic() {
@@ -49,4 +54,13 @@ void Node::serializeBoard() {
 
 void Node::addChild(Node* child) {
 	children.push_back(child);
+}
+
+void Node::removeChild(Node* child) {
+	for (int i = 0; i < children.size(); i++) {
+		if (children.at(i) == child) {
+			children.erase(children.begin() + i);
+			break;
+		}
+	}
 }

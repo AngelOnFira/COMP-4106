@@ -34,7 +34,6 @@ void AStar::runSearch() {
 		closed.insert({ thisState->boardSerialized, thisState });
 
 		/*#TODO
-		If it has already been seen (open or closed)
 			-if it is, see if the path is better
 
 		Find its children
@@ -80,7 +79,6 @@ void AStar::runSearch() {
 			}
 		}
 		iterations++;
-		delete[] this_board;
 	}
 }
 
@@ -112,6 +110,17 @@ void AStar::applyBoardChanges(int check1, int check2, int curr_pos) {
 
 			//Add as child of parent
 			thisState->addChild(newState);
+		}
+		else if (in_open == open.end() && in_closed != closed.end()) {
+			Node* alreadyState = closed[board_string];
+			Node* newState = new Node(new_board, thisState);
+
+			if (newState->score < alreadyState->score) {
+				alreadyState->parent->removeChild(alreadyState);
+				thisState->addChild(alreadyState);
+				alreadyState->calculateScore();
+			}
+			delete[] newState;
 		}
 		else {
 			delete[] new_board;
