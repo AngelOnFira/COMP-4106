@@ -111,15 +111,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="aStar.cpp" />
     <ClCompile Include="breadthFirst.cpp" />
     <ClCompile Include="depthFirst.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="state.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="aStar.h" />
     <ClInclude Include="breadthFirst.h" />
     <ClInclude Include="depthFirst.h" />
     <ClInclude Include="includes.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="state.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

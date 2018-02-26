@@ -40,6 +40,7 @@ int main() {
 	//Run the blank-slate version of the game
 	DepthFirst depth_first_search_easy = DepthFirst(start_board);
 	//BreadthFirst breadth_first_search_easy = BreadthFirst(start_board);
+  AStar aStarSearch = AStar(start_board);
 
 	//Run the bonus version of the game
 	//DepthFirst depth_first_search = DepthFirst(start_board_bonus);
