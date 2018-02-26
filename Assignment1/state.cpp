@@ -4,19 +4,23 @@ Node::Node(int* board, Node* parent) {
 	this->parent = parent;
 	this->board = board;
 
+	if (parent) {
+		this->depth = parent->depth + 1;
+	}
+
 	proximityHeuristic();
 	serializeBoard();
 }
 
 void Node::proximityHeuristic() {
 	int* scoreBoard = new int[ARR_SIZE] {
-		0    , 0    , 0.83f, 1    , 0.83f, 0    , 0    ,
-		0    , 1.17f, 1.76f, 2    , 1.76f, 1.17f, 0    ,
-		0.83f, 1.76f, 2.59f, 3    , 2.59f, 1.76f, 0.83f,
-		1    , 2    , 3    , 4    , 3    , 2    , 1    ,
-		0.83f, 1.76f, 2.59f, 3    , 2.59f, 1.76f, 0.83f,
-		0    , 1.17f, 1.76f, 2    , 1.76f, 1.17f, 0    ,
-		0    , 0    , 0.83f, 1    , 0.83f, 0    , 0
+		0    , 0    , 0.83f, 1, 0.83f, 0    , 0    ,
+		0    , 1.17f, 1.76f, 2, 1.76f, 1.17f, 0    ,
+		0.83f, 1.76f, 2.59f, 3, 2.59f, 1.76f, 0.83f,
+		1    , 2    , 3    , 4, 3    , 2    , 1    ,
+		0.83f, 1.76f, 2.59f, 3, 2.59f, 1.76f, 0.83f,
+		0    , 1.17f, 1.76f, 2, 1.76f, 1.17f, 0    ,
+		0    , 0    , 0.83f, 1, 0.83f, 0    , 0
 	};
 
 	float addScore = 0;
@@ -41,4 +45,8 @@ void Node::serializeBoard() {
 		}
 	}
 	boardSerialized = new_array;
+}
+
+void Node::addChild(Node* child) {
+	children.push_back(child);
 }

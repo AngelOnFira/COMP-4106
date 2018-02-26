@@ -23,8 +23,9 @@ int main() {
 		0, 0, 1, 1, 1, 0, 0, 0,
 	};*/
 
-	DepthFirst depth_first_search = DepthFirst(start_board);
-	BreadthFirst breadth_first_search = BreadthFirst(start_board);
+	//DepthFirst depth_first_search = DepthFirst(start_board);
+	//BreadthFirst breadth_first_search = BreadthFirst(start_board);
+	AStar aStarSearch = AStar(start_board);
 
 	system("PAUSE");
 

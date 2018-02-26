@@ -8,9 +8,10 @@ public:
 	AStar();
 	AStar(int* start_board);
 	void runSearch();
-	void applyBoardChanges(int* old_board, int check1, int check2, int curr_pos, std::vector<int>* old_path);
+	void applyBoardChanges(int check1, int check2, int curr_pos);
 	std::string convert_array(int* board);
 	void printBoard(int* board);
+	void sortFringe();
 
 	int one_count = 0;
 	int min = 100;
@@ -18,8 +19,10 @@ public:
 	bool compare = true;
 	int* win_board;
 	int* start_board;
+	int* this_board;
+	Node* thisState;
 
-	std::priority_queue<Node, std::vector<Node>, compareScore> fringe;
+	std::priority_queue<Node*, std::vector<Node*>, compareScore> fringe;
 	std::unordered_map<std::string, Node*> open;
 	std::unordered_map<std::string, Node*> closed;
 };
