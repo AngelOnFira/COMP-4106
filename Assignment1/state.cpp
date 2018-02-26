@@ -18,7 +18,7 @@ void Node::calculateScore() {
 }
 
 void Node::proximityHeuristic() {
-	int* scoreBoard = new int[ARR_SIZE] {
+	float* scoreBoard = new float[ARR_SIZE] {
 		0    , 0    , 0.83f, 1, 0.83f, 0    , 0    ,
 		0    , 1.17f, 1.76f, 2, 1.76f, 1.17f, 0    ,
 		0.83f, 1.76f, 2.59f, 3, 2.59f, 1.76f, 0.83f,
