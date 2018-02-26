@@ -4,19 +4,18 @@ BreadthFirst::BreadthFirst() {
 
 }
 
-BreadthFirst::BreadthFirst(int* start_board) {
+BreadthFirst::BreadthFirst(int* input_board) {
+	std::cout << "--------------------------------" << std::endl;
 	std::cout << "Running the breadth-first search" << std::endl;
-	win_board = new int[ARR_SIZE] {
-		0, 0, 2, 2, 2, 0, 0,
-		0, 2, 2, 2, 2, 2, 0,
-		2, 2, 2, 2, 2, 2, 2,
-		2, 2, 2, 1, 2, 2, 2,
-		2, 2, 2, 2, 2, 2, 2,
-		0, 2, 2, 2, 2, 2, 0,
-		0, 0, 2, 2, 2, 0, 0
-	};
+	std::cout << "--------------------------------" << std::endl;
 
-	this->start_board = start_board;
+	path_board = new int[ARR_SIZE];
+	start_board = new int[ARR_SIZE];
+
+	for (int i = 0; i < ARR_SIZE; i++) {
+		path_board[i] = input_board[i];
+		start_board[i] = input_board[i];
+	}
 
 	fringe.push(start_board);
 	std::vector<int>* start_path = new std::vector<int>();
@@ -42,28 +41,15 @@ void BreadthFirst::runSearch() {
 			}
 			if (one_count > 1) {
 				win = false;
-				//break;
+				break;
 			}
 		};
 
-		if (one_count < min) {
-			min = one_count;
-			std::cout << "Solved down to " << min << " pegs" << std::endl;
-		}
-
 		//Check if we have won
 		if (win) {
-			std::cout << "WIN" << std::endl;
-
-			int* path_board = new int[ARR_SIZE] {
-				0, 0, 1, 1, 1, 0, 0,
-				0, 1, 1, 1, 1, 1, 0,
-				1, 1, 1, 2, 1, 1, 1,
-				1, 1, 1, 1, 1, 1, 1,
-				1, 1, 1, 1, 1, 1, 1,
-				0, 1, 1, 1, 1, 1, 0,
-				0, 0, 1, 1, 1, 0, 0
-			};
+			std::cout << "This solution took " << iterations << " iterations to complete." << std::endl;
+			std::cout << "Here is the solution" << std::endl;
+			std::cout << "" << std::endl;
 
 			for (int i = 0; i < this_path->size(); i += 3) {
 				printBoard(path_board);
@@ -72,10 +58,22 @@ void BreadthFirst::runSearch() {
 				path_board[this_path->at(i + 2)] = 1;
 			}
 			printBoard(path_board);
-			std::cout << "This solution took " << iterations << " iterations to complete." << std::endl;
-			system("PAUSE");
-		}
 
+			std::cout << "-----------------------------" << std::endl;
+			std::cout << "End of breadth-first solution" << std::endl;
+			std::cout << "-----------------------------" << std::endl;
+			std::cout << "" << std::endl;
+
+			while (!fringe.empty()) {
+				int* del_board = fringe.front();
+				fringe.pop();
+				delete[] del_board;
+
+				std::vector<int>* del_path = breadcrumbs.front();
+				breadcrumbs.pop();
+				delete[] del_path;
+			}
+		}
 		for (int i = 0; i < ARR_SIZE; i++) {
 			if (this_board[i] == 2) {
 				int row = i / WIDTH;
@@ -95,10 +93,12 @@ void BreadthFirst::runSearch() {
 			}
 		}
 		iterations++;
+		delete this_path;
 		delete[] this_board;
 	}
 }
 
+//Make a move on a board
 void BreadthFirst::applyBoardChanges(int* old_board, int check1, int check2, int curr_pos, std::vector<int>* old_path) {
 	int* new_board = new int[ARR_SIZE];
 
@@ -115,7 +115,6 @@ void BreadthFirst::applyBoardChanges(int* old_board, int check1, int check2, int
 		delete[] new_board;
 		new_board = nullptr;
 	}
-
 	if (new_board) {
 		std::string board_string = convert_array(new_board);
 		std::unordered_map<std::string, bool>::const_iterator in_map = check_position.find(board_string);
@@ -138,6 +137,7 @@ void BreadthFirst::applyBoardChanges(int* old_board, int check1, int check2, int
 	}
 }
 
+//Convert a board state to a string that can be hashed
 std::string BreadthFirst::convert_array(int* board) {
 	std::string new_array = "";
 
@@ -149,6 +149,7 @@ std::string BreadthFirst::convert_array(int* board) {
 	return new_array;
 }
 
+//Display a board state in the console
 void BreadthFirst::printBoard(int* board) {
 	for (int y = 0; y < WIDTH; y++) {
 		for (int x = 0; x < WIDTH; x++) {
