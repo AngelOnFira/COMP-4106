@@ -34,11 +34,15 @@ int main() {
 	};*/
 
 	//Run the partly-finished version of the game
-	//DepthFirst depth_first_search = DepthFirst(start_board_easy);
+	DepthFirst depth_first_search = DepthFirst(start_board_easy);
 	BreadthFirst breadth_first_search = BreadthFirst(start_board_easy);
 
 	//Run the blank-slate version of the game
-	DepthFirst depth_first_search = DepthFirst(start_board);
+	DepthFirst depth_first_search_easy = DepthFirst(start_board);
+	//BreadthFirst breadth_first_search_easy = BreadthFirst(start_board);
+
+	//Run the bonus version of the game
+	//DepthFirst depth_first_search = DepthFirst(start_board_bonus);
 	//BreadthFirst breadth_first_search = BreadthFirst(start_board);
 
     return 1;

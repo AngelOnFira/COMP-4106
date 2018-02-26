@@ -41,9 +41,14 @@ void DepthFirst::runSearch() {
 			}
 			if (one_count > 1) {
 				win = false;
-				break;
+				//break;
 			}
 		};
+
+		if (one_count < min) {
+			min = one_count;
+			std::cout << min << std::endl;
+		}
 
 		//Check if we have won
 		if (win) {
