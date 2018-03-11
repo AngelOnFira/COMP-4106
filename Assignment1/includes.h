@@ -1,7 +1,7 @@
 #pragma once
 
-#define ARR_SIZE 64
-#define WIDTH 8
+#define ARR_SIZE 49
+#define WIDTH 7
 
 #include <iostream>
 #include <thread>

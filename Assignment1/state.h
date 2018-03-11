@@ -7,11 +7,8 @@ public:
 	Node();
 	Node(int* board, Node* parent);
 
-	void calculateScore();
-	void proximityHeuristic();
-	void serializeBoard();
-	void addChild(Node* child);
-	void removeChild(Node* child);
+	void Node::proximityHeuristic();
+	void Node::serializeBoard();
 
 	Node* parent;
 	std::vector<Node*> children;
@@ -22,5 +19,4 @@ public:
 	float score;
 	float proximityScore;
 	float viableMoveScore;
-	int depth = 0;
 };

@@ -24,12 +24,6 @@
     <ClCompile Include="breadthFirst.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
-    <ClCompile Include="aStar.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="state.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -42,12 +36,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="breadthFirst.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="aStar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="state.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
