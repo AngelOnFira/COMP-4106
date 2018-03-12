@@ -1,28 +1,90 @@
 //use std::process;
+extern crate rand;
+use rand::{thread_rng, Rng};
+
 pub static mut NODES_VISITED: i64 = 0;
 
 fn main() {
     //1 is my units
     //2 is enemy space
     //0 is empty space
-    let board: [[i8;6]; 6] = [
-    [2,2,2,2,2,2],
-    [2,1,0,0,1,2],
-    [2,0,0,0,0,2],
-    [2,0,0,0,0,2],
-    [2,1,0,0,1,2],
-    [2,2,2,2,2,2]];
+    
 
-    let mut places = Vec::new();
-    for i in 0..18 {
+    let mut board = create_board();
 
+    let mut win = false;
+    while !win {
+        board = ai_turn(board);
+        board = computer_turn();
     }
-
-    alphabeta(board, 15, -10000.0, 10000.0, true);
 
     unsafe {
         println!("Nodes visited {}", NODES_VISITED);
     }
+}
+
+fn ai_turn(board: [[i8;6]; 6]) -> [[i8;6]; 6] {
+    let mut moves = find_possible_moves(board);
+    
+    let mut curr_move = 0;
+    let mut curr_score = 0;
+
+    for i in 0..moves.len() {
+        let score = alphabeta(moves[i], 3, -10000.0, 10000.0, true);
+        if score > curr_score {
+            curr_score = score;
+            curr_move = i;
+        }
+    }
+
+    return moves[curr_move];
+}
+
+fn computer_turn(board: [[i8;6]; 6]) {
+    let mut moves = find_possible_moves(board);
+    let mut rng = thread_rng();
+
+    let rand_num: i8 = rng.gen_range(0, moves.len());
+    return moves[rand_num];
+}
+
+fn create_board() -> [[i8; 6]; 6] {
+    let mut rng = thread_rng();
+    let mut places = Vec::new();
+    let mut board: [[i8;6]; 6] = [
+    [2,2,2,2,2,2],
+    [2,2,2,2,2,2],
+    [2,2,2,2,2,2],
+    [2,2,2,2,2,2],
+    [2,2,2,2,2,2],
+    [2,2,2,2,2,2]];
+
+    for _piece in 0..18 {
+        let mut new_place = false;
+        while !new_place {
+            new_place = true;
+            let rand_num: i8 = rng.gen_range(0, 36);
+
+            for i in 0..places.len() {
+                if places[i] == rand_num {
+                    new_place = false;
+                    break;
+                }
+            }
+            if new_place {
+                places.push(rand_num);
+            }
+        }
+    }
+
+    while !places.is_empty() {
+        let place = places.pop().unwrap();
+        board[(place / 6) as usize][(place % 6) as usize] = 1;
+    }
+
+    print_board(board);
+
+    return board;
 }
 
 fn alphabeta(board: [[i8;6]; 6], depth: i16, alpha_in: f32, beta_in: f32, max_player: bool) -> f32 {
@@ -93,6 +155,42 @@ fn push_piece(row: usize, col: usize, board: [[i8;6]; 6]) -> Vec<[[i8; 6]; 6]> {
     let mut children = Vec::new();
     let mut child_board = board;
 
+    if row > 0 {
+        if board[row - 1][col] == 0 {
+            let mut new_board = board;
+            new_board[row - 1][col] = 1;
+            new_board[row][col] = 0;
+            children.push(new_board);
+        }
+    }
+
+    if row < 5 {
+        if board[row + 1][col] == 0 {
+            let mut new_board = board;
+            new_board[row + 1][col] = 1;
+            new_board[row][col] = 0;
+            children.push(new_board);
+        }
+    }
+
+    if col > 0 {
+        if board[row][col - 1] == 0 {
+            let mut new_board = board;
+            new_board[row][col - 1] = 1;
+            new_board[row][col] = 0;
+            children.push(new_board);
+        }
+    }
+
+    if col < 5 {
+        if board[row][col + 1] == 0 {
+            let mut new_board = board;
+            new_board[row][col + 1] = 1;
+            new_board[row][col] = 0;
+            children.push(new_board);
+        }
+    }
+
     //Test pushing in all four directions
     'outer1: for x in (0..col + 1).rev() {
         let mut last = 0;
@@ -103,40 +201,17 @@ fn push_piece(row: usize, col: usize, board: [[i8;6]; 6]) -> Vec<[[i8; 6]; 6]> {
             last = curr;
             //Check if we have just pushed into an empty position
             if last == 0 {
-                /*
-                print_board(child_board);
-                println!("left: {}", x);
-                println!("remove: {}", remove);
-                println!("last: {}", last);
-                println!("pushed empty");
-                println!("");
-                println!("");
-                */
                 break 'inner1;
             }
         }
         //Break to outer if we have pushed one of our own off
         //the board, don't add it to children to look at
         if last == 1 {
-            /*
-            print_board(child_board);
-            println!("left: {}", x);
-            println!("last: {}", last);
-            println!("pushed our own");
-            println!("");
-            println!("");
-            */
             break 'outer1;
         }
         //If we pushed an enemy off the board, add as a
         //child
         else if last == 2 {
-            /*
-            print_board(child_board);
-            println!("left: {}", x);
-            println!("last: {}", last);
-            println!("pushed off enemy");
-            */
             children.push(child_board);
         }
     }
