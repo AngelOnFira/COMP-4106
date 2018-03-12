@@ -1,7 +1,7 @@
 //use std::process;
+pub static mut NODES_VISITED: i64 = 0;
 
 fn main() {
-
     //1 is my units
     //2 is enemy space
     //0 is empty space
@@ -13,39 +13,57 @@ fn main() {
     [2,1,0,0,1,2],
     [2,2,2,2,2,2]];
 
-    alphabeta(board, 3, -10000, 10000, true);
+    let mut places = Vec::new();
+    for i in 0..18 {
+
+    }
+
+    alphabeta(board, 15, -10000.0, 10000.0, true);
+
+    unsafe {
+        println!("Nodes visited {}", NODES_VISITED);
+    }
 }
 
-fn alphabeta(board: [[i8;6]; 6], depth: i8, alpha: i8, beta: i8, max: bool) {
-    if depth == 0 {
-        return get_heuristic(board);
+fn alphabeta(board: [[i8;6]; 6], depth: i16, alpha_in: f32, beta_in: f32, max_player: bool) -> f32 {
+    let mut alpha = alpha_in;
+    let mut beta = beta_in;
+
+    unsafe {
+        NODES_VISITED += 1;
     }
 
     let mut children = find_possible_moves(board);
 
-    children.len() == 0 {
-        return get_heuristic(board);
+    if depth == 0 {
+        return children.len() as f32;
+        //return get_heuristic(board);
     }
 
-    if max {
-        let mut v = -10000;
-        while (!children.is_empty()) {
+    if children.len() == 0 {
+        return 0 as f32;
+        //return get_heuristic(board);
+    }
+
+    if max_player {
+        let mut v = -10000 as f32;
+        while !children.is_empty() {
             let child = children.pop().unwrap();
-            v = max(v, alphabeta(child, depth - 1, alpha, beta, false);
+            v = max(v, alphabeta(child, depth - 1, alpha, beta, false));
             alpha = max(alpha, v);
-            if (beta <= alpha) {
+            if beta <= alpha {
                 break;
             }
         }
         return v;
     }
     else {
-        let mut v = 10000;
-        while (!children.is_empty()) {
+        let mut v = 10000 as f32;
+        while !children.is_empty() {
             let child = children.pop().unwrap();
-            v = min(v, alphabeta(child, depth - 1, alpha, beta, true);)
+            v = min(v, alphabeta(child, depth - 1, alpha, beta, true));
             beta = min(beta, v);
-            if (beta <= alpha) {
+            if beta <= alpha {
                 break;
             }
         }
@@ -68,6 +86,7 @@ fn find_possible_moves(board: [[i8;6]; 6]) -> Vec<[[i8; 6]; 6]> {
         }
     }
     //println!("len {}", children.len());
+    return children;
 }
 
 fn push_piece(row: usize, col: usize, board: [[i8;6]; 6]) -> Vec<[[i8; 6]; 6]> {
@@ -199,9 +218,9 @@ fn push_piece(row: usize, col: usize, board: [[i8;6]; 6]) -> Vec<[[i8; 6]; 6]> {
     return children;
 }
 
-fn get_heuristic(board: [[i8;6]; 6]) -> f32 {
+fn get_heuristic(_board: [[i8;6]; 6]) -> f32 {
     //TODO
-    return 1;
+    return 1 as f32;
 }
 
 fn print_board(board: [[i8;6]; 6]) {
@@ -213,6 +232,24 @@ fn print_board(board: [[i8;6]; 6]) {
         println!("");
     }
     println!("__________")
+}
+
+fn max(a: f32, b: f32) -> f32 {
+    if a > b {
+        return a;
+    }
+    else {
+        return b;
+    }
+}
+
+fn min(a: f32, b: f32) -> f32 {
+    if a < b {
+        return a;
+    }
+    else {
+        return b;
+    }
 }
 
 //fn findChildren(board: )
