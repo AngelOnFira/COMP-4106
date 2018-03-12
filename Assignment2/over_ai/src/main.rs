@@ -13,14 +13,45 @@ fn main() {
     [2,1,0,0,1,2],
     [2,2,2,2,2,2]];
 
-    for i in (0..10 + 1).rev() {
-        println!("{}", i);
-    }
-
-    find_possible_moves(board)
+    alphabeta(board, 3, -10000, 10000, true);
 }
 
-//fn minimax(board: [[i8;6]; 6])
+fn alphabeta(board: [[i8;6]; 6], depth: i8, alpha: i8, beta: i8, max: bool) {
+    if depth == 0 {
+        return get_heuristic(board);
+    }
+
+    let mut children = find_possible_moves(board);
+
+    children.len() == 0 {
+        return get_heuristic(board);
+    }
+
+    if max {
+        let mut v = -10000;
+        while (!children.is_empty()) {
+            let child = children.pop().unwrap();
+            v = max(v, alphabeta(child, depth - 1, alpha, beta, false);
+            alpha = max(alpha, v);
+            if (beta <= alpha) {
+                break;
+            }
+        }
+        return v;
+    }
+    else {
+        let mut v = 10000;
+        while (!children.is_empty()) {
+            let child = children.pop().unwrap();
+            v = min(v, alphabeta(child, depth - 1, alpha, beta, true);)
+            beta = min(beta, v);
+            if (beta <= alpha) {
+                break;
+            }
+        }
+        return v;
+    }
+}
 
 fn find_possible_moves(board: [[i8;6]; 6]) -> Vec<[[i8; 6]; 6]> {
     let mut children = Vec::new();
@@ -166,6 +197,11 @@ fn push_piece(row: usize, col: usize, board: [[i8;6]; 6]) -> Vec<[[i8; 6]; 6]> {
         }
     }
     return children;
+}
+
+fn get_heuristic(board: [[i8;6]; 6]) -> f32 {
+    //TODO
+    return 1;
 }
 
 fn print_board(board: [[i8;6]; 6]) {
