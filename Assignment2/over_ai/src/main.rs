@@ -1,4 +1,4 @@
-//use std::process;
+use std::process;
 extern crate rand;
 use rand::{thread_rng, Rng};
 
@@ -9,13 +9,22 @@ fn main() {
     //2 is enemy space
     //0 is empty space
     
+    for games in 0..5 {
+        let mut board = create_board();
 
-    let mut board = create_board();
-
-    let mut win = false;
-    while !win {
-        board = ai_turn(board);
-        board = computer_turn();
+        let mut i = 0;
+        while true {
+            i += 1;
+            board = ai_turn(board);
+            print_board(board);
+            if check_win(board) != 0 { println!("The AI wins"); break; }
+            board = computer_turn(board);
+            print_board(board);
+            if check_win(board) != 0 { println!("The computer wins"); break; }
+            if i > 100 {
+                process::exit(1);
+            }
+        }
     }
 
     unsafe {
@@ -23,14 +32,48 @@ fn main() {
     }
 }
 
+fn check_win(board: [[i8;6]; 6]) -> i8 {
+    let mut player_1 = 0;
+    let mut player_2 = 0;
+    for row in 0..6 {
+        for col in 0..6 {
+            if board[row][col] == 1 {
+                player_1 += 1;
+            }
+            if board[row][col] == 2 {
+                player_2 += 1;
+            }
+            if player_1 != 0 && player_2 != 0 {
+                return 0;
+            }
+        }
+    }
+    if player_1 == 0 {
+        return 2;
+    }
+    if player_2 == 0 {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+fn print_moves(moves: Vec<[[i8; 6]; 6]>) {
+    for i in 0..moves.len() {
+        println!("comp move");
+        print_board(moves[i]);
+    }
+}
+
 fn ai_turn(board: [[i8;6]; 6]) -> [[i8;6]; 6] {
-    let mut moves = find_possible_moves(board);
+    let mut moves = find_possible_moves(board, 1, 2);
     
     let mut curr_move = 0;
-    let mut curr_score = 0;
+    let mut curr_score = 0.0;
 
     for i in 0..moves.len() {
-        let score = alphabeta(moves[i], 3, -10000.0, 10000.0, true);
+        let score = alphabeta(moves[i], 3, -10000.0, 10000.0, true, 1, 2);
         if score > curr_score {
             curr_score = score;
             curr_move = i;
@@ -40,12 +83,17 @@ fn ai_turn(board: [[i8;6]; 6]) -> [[i8;6]; 6] {
     return moves[curr_move];
 }
 
-fn computer_turn(board: [[i8;6]; 6]) {
-    let mut moves = find_possible_moves(board);
+fn computer_turn(board: [[i8;6]; 6]) -> [[i8;6]; 6] {
+    let mut moves = find_possible_moves(board, 2, 1);
     let mut rng = thread_rng();
 
-    let rand_num: i8 = rng.gen_range(0, moves.len());
-    return moves[rand_num];
+    for i in 0..moves.len() {
+        println!("comp move");
+        print_board(moves[i]);
+    }
+
+    let rand_num: i8 = rng.gen_range(0, moves.len() as i8);
+    return moves[rand_num as usize];
 }
 
 fn create_board() -> [[i8; 6]; 6] {
@@ -87,7 +135,7 @@ fn create_board() -> [[i8; 6]; 6] {
     return board;
 }
 
-fn alphabeta(board: [[i8;6]; 6], depth: i16, alpha_in: f32, beta_in: f32, max_player: bool) -> f32 {
+fn alphabeta(board: [[i8;6]; 6], depth: i16, alpha_in: f32, beta_in: f32, max_player: bool, player_piece: i8, other_piece: i8) -> f32 {
     let mut alpha = alpha_in;
     let mut beta = beta_in;
 
@@ -95,7 +143,7 @@ fn alphabeta(board: [[i8;6]; 6], depth: i16, alpha_in: f32, beta_in: f32, max_pl
         NODES_VISITED += 1;
     }
 
-    let mut children = find_possible_moves(board);
+    let mut children = find_possible_moves(board, player_piece, other_piece);
 
     if depth == 0 {
         return children.len() as f32;
@@ -111,7 +159,7 @@ fn alphabeta(board: [[i8;6]; 6], depth: i16, alpha_in: f32, beta_in: f32, max_pl
         let mut v = -10000 as f32;
         while !children.is_empty() {
             let child = children.pop().unwrap();
-            v = max(v, alphabeta(child, depth - 1, alpha, beta, false));
+            v = max(v, alphabeta(child, depth - 1, alpha, beta, false, player_piece, other_piece));
             alpha = max(alpha, v);
             if beta <= alpha {
                 break;
@@ -123,7 +171,7 @@ fn alphabeta(board: [[i8;6]; 6], depth: i16, alpha_in: f32, beta_in: f32, max_pl
         let mut v = 10000 as f32;
         while !children.is_empty() {
             let child = children.pop().unwrap();
-            v = min(v, alphabeta(child, depth - 1, alpha, beta, true));
+            v = min(v, alphabeta(child, depth - 1, alpha, beta, true, player_piece, other_piece));
             beta = min(beta, v);
             if beta <= alpha {
                 break;
@@ -133,14 +181,14 @@ fn alphabeta(board: [[i8;6]; 6], depth: i16, alpha_in: f32, beta_in: f32, max_pl
     }
 }
 
-fn find_possible_moves(board: [[i8;6]; 6]) -> Vec<[[i8; 6]; 6]> {
+fn find_possible_moves(board: [[i8;6]; 6], player_piece: i8, other_piece: i8) -> Vec<[[i8; 6]; 6]> {
     let mut children = Vec::new();
 
     for row in 0..board.len() - 1 {
         for col in 0..board[0].len() - 1 {
-            if board[row][col] == 1 {
+            if board[row][col] == player_piece {
                 //Simulates a piece being pushed all the way to one side
-                let mut new_children = push_piece(row, col, board);
+                let mut new_children = push_piece(row, col, board, player_piece, other_piece);
                 while !new_children.is_empty() {
                     children.push(new_children.pop().unwrap());
                 }
@@ -151,14 +199,14 @@ fn find_possible_moves(board: [[i8;6]; 6]) -> Vec<[[i8; 6]; 6]> {
     return children;
 }
 
-fn push_piece(row: usize, col: usize, board: [[i8;6]; 6]) -> Vec<[[i8; 6]; 6]> {
+fn push_piece(row: usize, col: usize, board: [[i8;6]; 6], player_piece: i8, other_piece: i8) -> Vec<[[i8; 6]; 6]> {
     let mut children = Vec::new();
     let mut child_board = board;
 
     if row > 0 {
         if board[row - 1][col] == 0 {
             let mut new_board = board;
-            new_board[row - 1][col] = 1;
+            new_board[row - 1][col] = player_piece;
             new_board[row][col] = 0;
             children.push(new_board);
         }
@@ -167,7 +215,7 @@ fn push_piece(row: usize, col: usize, board: [[i8;6]; 6]) -> Vec<[[i8; 6]; 6]> {
     if row < 5 {
         if board[row + 1][col] == 0 {
             let mut new_board = board;
-            new_board[row + 1][col] = 1;
+            new_board[row + 1][col] = player_piece;
             new_board[row][col] = 0;
             children.push(new_board);
         }
@@ -176,7 +224,7 @@ fn push_piece(row: usize, col: usize, board: [[i8;6]; 6]) -> Vec<[[i8; 6]; 6]> {
     if col > 0 {
         if board[row][col - 1] == 0 {
             let mut new_board = board;
-            new_board[row][col - 1] = 1;
+            new_board[row][col - 1] = player_piece;
             new_board[row][col] = 0;
             children.push(new_board);
         }
@@ -185,7 +233,7 @@ fn push_piece(row: usize, col: usize, board: [[i8;6]; 6]) -> Vec<[[i8; 6]; 6]> {
     if col < 5 {
         if board[row][col + 1] == 0 {
             let mut new_board = board;
-            new_board[row][col + 1] = 1;
+            new_board[row][col + 1] = player_piece;
             new_board[row][col] = 0;
             children.push(new_board);
         }
@@ -206,12 +254,12 @@ fn push_piece(row: usize, col: usize, board: [[i8;6]; 6]) -> Vec<[[i8; 6]; 6]> {
         }
         //Break to outer if we have pushed one of our own off
         //the board, don't add it to children to look at
-        if last == 1 {
+        if last == player_piece {
             break 'outer1;
         }
         //If we pushed an enemy off the board, add as a
         //child
-        else if last == 2 {
+        else if last == other_piece {
             children.push(child_board);
         }
     }
@@ -231,12 +279,12 @@ fn push_piece(row: usize, col: usize, board: [[i8;6]; 6]) -> Vec<[[i8; 6]; 6]> {
         }
         //Break to outer if we have pushed one of our own off
         //the board, don't add it to children to look at
-        if last == 1 {
+        if last == player_piece {
             break 'outer2;
         }
         //If we pushed an enemy off the board, add as a
         //child
-        else if last == 2 {
+        else if last == other_piece {
             children.push(child_board);
         }
     }
@@ -256,12 +304,12 @@ fn push_piece(row: usize, col: usize, board: [[i8;6]; 6]) -> Vec<[[i8; 6]; 6]> {
         }
         //Break to outer if we have pushed one of our own off
         //the board, don't add it to children to look at
-        if last == 1 {
+        if last == player_piece {
             break 'outer3;
         }
         //If we pushed an enemy off the board, add as a
         //child
-        else if last == 2 {
+        else if last == other_piece {
             children.push(child_board);
         }
     }
@@ -281,12 +329,12 @@ fn push_piece(row: usize, col: usize, board: [[i8;6]; 6]) -> Vec<[[i8; 6]; 6]> {
         }
         //Break to outer if we have pushed one of our own off
         //the board, don't add it to children to look at
-        if last == 1 {
+        if last == player_piece {
             break 'outer4;
         }
         //If we pushed an enemy off the board, add as a
         //child
-        else if last == 2 {
+        else if last == other_piece {
             children.push(child_board);
         }
     }
@@ -299,14 +347,22 @@ fn get_heuristic(_board: [[i8;6]; 6]) -> f32 {
 }
 
 fn print_board(board: [[i8;6]; 6]) {
-    println!("__________");
+    println!("_____________");
     for row in 0..6 {
         for col in 0..6 {
-            print!("{}", board[row][col]);
+            if board[row][col] == 0 {
+                print!("| ");
+            }
+            else if board[row][col] == 1 {
+                print!("|O");
+            }
+            else if board[row][col] == 2 {
+                print!("|#");
+            }
         }
-        println!("");
+        println!("|");
     }
-    println!("__________")
+    println!("_____________")
 }
 
 fn max(a: f32, b: f32) -> f32 {
