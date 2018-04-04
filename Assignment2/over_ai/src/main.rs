@@ -15,14 +15,39 @@ fn main() {
         let mut i = 0;
         while true {
             i += 1;
-            board = ai_turn(board);
-            print_board(board);
+            board = ai_turn_enemy_children(board);
+            //println!("Random Move");
+            //print_board(board);
             if check_win(board) != 0 { println!("The AI wins"); break; }
             board = computer_turn(board);
-            print_board(board);
-            if check_win(board) != 0 { println!("The computer wins"); break; }
+            //println!("Heuristic Move");
+            //print_board(board);
+            if check_win(board) != 0 { println!("The Random wins"); break; }
             if i > 100 {
-                process::exit(1);
+                break;
+            }
+        }
+
+        unsafe {
+            println!("Nodes visited {}", NODES_VISITED);
+        }
+
+        let mut i = 0;
+        while false {
+            i += 1;
+            board = ai_turn_my_children(board);
+            println!("First AI Move");
+            print_board(board);
+            if check_win(board) != 0 { println!("The first AI wins"); break; }
+            board = ai_turn_enemy_children(board);
+            println!("Second AI Move");
+            unsafe {
+            println!("Nodes visited {}", NODES_VISITED);
+            }
+            print_board(board);
+            if check_win(board) != 0 { println!("The second AI wins"); break; }
+            if i > 100 {
+                break;
             }
         }
     }
@@ -66,14 +91,31 @@ fn print_moves(moves: Vec<[[i8; 6]; 6]>) {
     }
 }
 
-fn ai_turn(board: [[i8;6]; 6]) -> [[i8;6]; 6] {
+fn ai_turn_my_children(board: [[i8;6]; 6]) -> [[i8;6]; 6] {
     let mut moves = find_possible_moves(board, 1, 2);
     
     let mut curr_move = 0;
     let mut curr_score = 0.0;
 
     for i in 0..moves.len() {
-        let score = alphabeta(moves[i], 3, -10000.0, 10000.0, true, 1, 2);
+        let score = alphabeta(moves[i], 2, -10000.0, 10000.0, true, 1, 2, 1);
+        if score > curr_score {
+            curr_score = score;
+            curr_move = i;
+        }
+    }
+
+    return moves[curr_move];
+}
+
+fn ai_turn_enemy_children(board: [[i8;6]; 6]) -> [[i8;6]; 6] {
+    let mut moves = find_possible_moves(board, 1, 2);
+    
+    let mut curr_move = 0;
+    let mut curr_score = 0.0;
+
+    for i in 0..moves.len() {
+        let score = alphabeta(moves[i], 2, -10000.0, 10000.0, true, 2, 1, 2);
         if score > curr_score {
             curr_score = score;
             curr_move = i;
@@ -87,10 +129,10 @@ fn computer_turn(board: [[i8;6]; 6]) -> [[i8;6]; 6] {
     let mut moves = find_possible_moves(board, 2, 1);
     let mut rng = thread_rng();
 
-    for i in 0..moves.len() {
-        println!("comp move");
-        print_board(moves[i]);
-    }
+    //for i in 0..moves.len() {
+        //println!("comp move");
+        //print_board(moves[i]);
+    //}
 
     let rand_num: i8 = rng.gen_range(0, moves.len() as i8);
     return moves[rand_num as usize];
@@ -135,31 +177,41 @@ fn create_board() -> [[i8; 6]; 6] {
     return board;
 }
 
-fn alphabeta(board: [[i8;6]; 6], depth: i16, alpha_in: f32, beta_in: f32, max_player: bool, player_piece: i8, other_piece: i8) -> f32 {
+fn alphabeta(board: [[i8;6]; 6], depth: i16, alpha_in: f32, beta_in: f32, max_player: bool, player_piece: i8, other_piece: i8, heuristic: i8) -> f32 {
     let mut alpha = alpha_in;
     let mut beta = beta_in;
 
     unsafe {
+        if heuristic == 2 {
         NODES_VISITED += 1;
+        }
     }
 
     let mut children = find_possible_moves(board, player_piece, other_piece);
 
     if depth == 0 {
-        return children.len() as f32;
-        //return get_heuristic(board);
+        if heuristic == 1 {
+            return children.len() as f32;
+        }
+        if heuristic == 2 {
+            return 1.0 / find_possible_moves(board, other_piece, player_piece).len() as f32;
+        }
     }
 
     if children.len() == 0 {
-        return 0 as f32;
-        //return get_heuristic(board);
+        if heuristic == 1 {
+            return children.len() as f32;
+        }
+        if heuristic == 2 {
+            return 1.0 / find_possible_moves(board, other_piece, player_piece).len() as f32;
+        }
     }
 
     if max_player {
         let mut v = -10000 as f32;
         while !children.is_empty() {
             let child = children.pop().unwrap();
-            v = max(v, alphabeta(child, depth - 1, alpha, beta, false, player_piece, other_piece));
+            v = max(v, alphabeta(child, depth - 1, alpha, beta, false, player_piece, other_piece, heuristic));
             alpha = max(alpha, v);
             if beta <= alpha {
                 break;
@@ -171,7 +223,7 @@ fn alphabeta(board: [[i8;6]; 6], depth: i16, alpha_in: f32, beta_in: f32, max_pl
         let mut v = 10000 as f32;
         while !children.is_empty() {
             let child = children.pop().unwrap();
-            v = min(v, alphabeta(child, depth - 1, alpha, beta, true, player_piece, other_piece));
+            v = min(v, alphabeta(child, depth - 1, alpha, beta, true, player_piece, other_piece, heuristic));
             beta = min(beta, v);
             if beta <= alpha {
                 break;
@@ -184,8 +236,8 @@ fn alphabeta(board: [[i8;6]; 6], depth: i16, alpha_in: f32, beta_in: f32, max_pl
 fn find_possible_moves(board: [[i8;6]; 6], player_piece: i8, other_piece: i8) -> Vec<[[i8; 6]; 6]> {
     let mut children = Vec::new();
 
-    for row in 0..board.len() - 1 {
-        for col in 0..board[0].len() - 1 {
+    for row in 0..board.len() {
+        for col in 0..board[0].len() {
             if board[row][col] == player_piece {
                 //Simulates a piece being pushed all the way to one side
                 let mut new_children = push_piece(row, col, board, player_piece, other_piece);
