@@ -1,13 +1,13 @@
-**D,*R*,**R,**Y
-D - 3,**Y,**G,B**
-**G,**B,D - 3,**D
-R**,D - 3,***,D*Y
-D - 2,D*R,D*B,D - 3
-Y**,*Y*,*Y*,**R
-B*G,D - 2,D - 2,R**
-***,D**,B**,D - 2
-*B*,***,D**,*G*
-D - 1,B**,*R*,G**
-**R,**G,D - 1,D - 1
-*D*,D - 1,**Y,***
-Y**,G**,**Y,*B*
+NND,NRN,NNR,NNY
+D - 3,NNY,NNG,BNN
+NNG,NNB,D - 3,NND
+RNN,D - 3,NNN,DNY
+D - 2,DNR,DNB,D - 3
+YNN,NYN,NYN,NNR
+BNG,D - 2,D - 2,RNN
+NNN,DNN,BNN,D - 2
+NBN,NNN,DNN,NGN
+D - 1,BNN,NRN,GNN
+NNR,NNG,D - 1,D - 1
+NDN,D - 1,NNY,NNN
+YNN,GNN,NNY,NBN
